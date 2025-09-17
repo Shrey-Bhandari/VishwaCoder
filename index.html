@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Leaf Health Assessment</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 font-sans">
+
+  <!-- Header -->
+  <div class="bg-green-700 text-white text-center py-4 shadow-lg">
+    <h1 class="text-2xl font-bold">🌱 AI-Driven Leaf Health Assessment</h1>
+    <p class="text-sm">Damage Quantification • Leaf Area Index • Recommendations</p>
+  </div>
+
+  <!-- Main Container -->
+  <div class="max-w-3xl mx-auto mt-8 p-6 bg-white rounded-xl shadow-lg">
+
+    <!-- Crop Selection -->
+    <label class="block mb-2 text-lg font-medium text-gray-700">Select Crop</label>
+    <select class="w-full p-2 border rounded-lg mb-4">
+      <option>Wheat</option>
+      <option>Rice</option>
+      <option>Maize</option>
+      <option>Corn</option>
+      <option>Potato</option>
+      <option>Sugarcane</option>
+      <option>Banana</option>
+      <option>Tomato</option>
+      <option>Cotton</option>
+      <option>Soyabean</option>
+      <option>Turmeric</option>
+      <option>Toor Dal (Pigeon Pea)</option>
+      <option>Bajra</option>
+    </select>
+
+    <!-- Image Upload -->
+    <label class="block mb-2 text-lg font-medium text-gray-700">Upload Leaf Image</label>
+    <input type="file" class="w-full p-2 border rounded-lg mb-6">
+
+    <!-- Submit Button -->
+    <button class="w-full bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-lg font-semibold">
+      Analyze Leaf
+    </button>
+  </div>
+
+  <!-- Results Section -->
+  <div class="max-w-3xl mx-auto mt-8 p-6 bg-white rounded-xl shadow-lg">
+    <h2 class="text-xl font-bold mb-4">Results</h2>
+    <ul class="space-y-2 text-gray-700">
+      <li>🌿 <b>Health Status:</b> Healthy</li>
+      <li>⚡ <b>Damage %:</b> 15%</li>
+      <li>📊 <b>Severity:</b> Mild</li>
+      <li>📐 <b>Leaf Area Index (LAI):</b> 2.1</li>
+      <li>💡 <b>Recommendation:</b> No treatment required. Maintain watering.</li>
+    </ul>
+
+    <!-- Voice Output Button -->
+    <button class="mt-6 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg font-semibold">
+      🔊 Hear Report
+    </button>
+  </div>
+
+  <!-- Footer -->
+  <div class="text-center text-gray-500 text-sm mt-6 mb-4">
+    © 2025 Smart AgriTech Hackathon | Team AI Farmers
+  </div>
+
+</body>
+</html>
