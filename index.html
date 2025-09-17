@@ -1,71 +1,515 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AI Leaf Health Assessment</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CropGuard AI - Leaf Health Assessment</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c5530 0%, #4a7c59 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="2" fill="rgba(255,255,255,0.1)"/></svg>') repeat;
+            animation: float 20s infinite linear;
+        }
+
+        @keyframes float {
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
+        .header h1 {
+            position: relative;
+            z-index: 2;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .header p {
+            position: relative;
+            z-index: 2;
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            padding: 40px;
+        }
+
+        .step {
+            margin-bottom: 40px;
+            padding: 30px;
+            background: linear-gradient(135deg, #f8f9ff 0%, #e8f4f8 100%);
+            border-radius: 15px;
+            border-left: 5px solid #4a7c59;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+        }
+
+        .step:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12);
+        }
+
+        .step h3 {
+            color: #2c5530;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .step-number {
+            background: #4a7c59;
+            color: white;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+
+        .crop-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .crop-card {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .crop-card:hover {
+            border-color: #4a7c59;
+            transform: scale(1.05);
+            box-shadow: 0 10px 20px rgba(74, 124, 89, 0.2);
+        }
+
+        .crop-card.selected {
+            border-color: #4a7c59;
+            background: linear-gradient(135deg, #e8f5e8 0%, #f0f8f0 100%);
+        }
+
+        .crop-card::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, #4a7c59, #2c5530);
+            border-radius: 12px;
+            z-index: -1;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .crop-card.selected::before {
+            opacity: 1;
+        }
+
+        .upload-area {
+            border: 3px dashed #4a7c59;
+            border-radius: 15px;
+            padding: 40px;
+            text-align: center;
+            background: linear-gradient(135deg, #f0f8f0 0%, #e8f5e8 100%);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .upload-area:hover {
+            border-color: #2c5530;
+            background: linear-gradient(135deg, #e8f5e8 0%, #d4edda 100%);
+            transform: scale(1.02);
+        }
+
+        .upload-area.dragover {
+            background: linear-gradient(135deg, #d4edda 0%, #c3e6c3 100%);
+            border-color: #2c5530;
+        }
+
+        .upload-icon {
+            font-size: 4em;
+            color: #4a7c59;
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        .optional-inputs {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .input-group {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            border: 2px solid #e0e0e0;
+            transition: all 0.3s ease;
+        }
+
+        .input-group:focus-within {
+            border-color: #4a7c59;
+            box-shadow: 0 0 15px rgba(74, 124, 89, 0.1);
+        }
+
+        .input-group label {
+            display: block;
+            color: #2c5530;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: all 0.3s ease;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #4a7c59;
+            box-shadow: 0 0 10px rgba(74, 124, 89, 0.1);
+        }
+
+        .analyze-btn {
+            background: linear-gradient(135deg, #4a7c59 0%, #2c5530 100%);
+            color: white;
+            border: none;
+            padding: 18px 40px;
+            font-size: 1.3em;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 25px rgba(74, 124, 89, 0.3);
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .analyze-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(74, 124, 89, 0.4);
+        }
+
+        .analyze-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: 0 5px 15px rgba(74, 124, 89, 0.2);
+        }
+
+        .results-section {
+            margin-top: 40px;
+            padding: 30px;
+            background: linear-gradient(135deg, #fff9e6 0%, #f0f8f0 100%);
+            border-radius: 15px;
+            border: 2px solid #4a7c59;
+            display: none;
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .result-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            border-left: 5px solid #4a7c59;
+        }
+
+        .result-card h4 {
+            color: #2c5530;
+            margin-bottom: 10px;
+            font-size: 1.2em;
+        }
+
+        .result-value {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .health-status {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 25px;
+            color: white;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .healthy { background: #28a745; }
+        .diseased { background: #dc3545; }
+
+        .severity {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 0.9em;
+        }
+
+        .mild { background: #fff3cd; color: #856404; }
+        .moderate { background: #f8d7da; color: #721c24; }
+        .severe { background: #d4edda; color: #155724; }
+
+        .recommendations {
+            background: #e8f5e8;
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 20px;
+            border-left: 5px solid #4a7c59;
+        }
+
+        .voice-controls {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .voice-btn {
+            background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            cursor: pointer;
+            margin: 0 10px;
+            transition: all 0.3s ease;
+        }
+
+        .voice-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(23, 162, 184, 0.3);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 4px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4a7c59, #2c5530);
+            width: 0%;
+            transition: width 2s ease;
+            border-radius: 4px;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 20px;
+            }
+
+            .crop-grid {
+                grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+                gap: 10px;
+            }
+
+            .optional-inputs {
+                grid-template-columns: 1fr;
+            }
+
+            .header h1 {
+                font-size: 2em;
+            }
+        }
+    </style>
 </head>
-<body class="bg-gray-100 font-sans">
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🌱 CropGuard AI</h1>
+            <p>Advanced Leaf Health Assessment for Smart Farming</p>
+        </div>
 
-  <!-- Header -->
-  <div class="bg-green-700 text-white text-center py-4 shadow-lg">
-    <h1 class="text-2xl font-bold">🌱 AI-Driven Leaf Health Assessment</h1>
-    <p class="text-sm">Damage Quantification • Leaf Area Index • Recommendations</p>
-  </div>
+        <div class="main-content">
+            <!-- Step 1: Select Crop -->
+            <div class="step">
+                <h3><span class="step-number">1</span>Select Your Crop</h3>
+                <div class="crop-grid" id="cropGrid">
+                    <div class="crop-card" data-crop="wheat">🌾 Wheat</div>
+                    <div class="crop-card" data-crop="rice">🍚 Rice</div>
+                    <div class="crop-card" data-crop="maize">🌽 Maize</div>
+                    <div class="crop-card" data-crop="corn">🌽 Corn</div>
+                    <div class="crop-card" data-crop="potato">🥔 Potato</div>
+                    <div class="crop-card" data-crop="sugarcane">🎋 Sugarcane</div>
+                    <div class="crop-card" data-crop="banana">🍌 Banana</div>
+                    <div class="crop-card" data-crop="tomato">🍅 Tomato</div>
+                    <div class="crop-card" data-crop="cotton">☁️ Cotton</div>
+                    <div class="crop-card" data-crop="soybean">🫘 Soybean</div>
+                    <div class="crop-card" data-crop="turmeric">🟡 Turmeric</div>
+                    <div class="crop-card" data-crop="toor-dal">🫛 Toor Dal</div>
+                    <div class="crop-card" data-crop="bajra">🌾 Bajra</div>
+                </div>
+                <p id="selectedCrop" style="margin-top: 15px; font-weight: bold; color: #4a7c59;"></p>
+            </div>
 
-  <!-- Main Container -->
-  <div class="max-w-3xl mx-auto mt-8 p-6 bg-white rounded-xl shadow-lg">
+            <!-- Step 2: Upload Image -->
+            <div class="step">
+                <h3><span class="step-number">2</span>Upload Leaf Image</h3>
+                <div class="upload-area" id="uploadArea">
+                    <span class="upload-icon">📸</span>
+                    <h4>Drag & Drop or Click to Upload</h4>
+                    <p>Supported formats: JPG, PNG (Max 10MB)</p>
+                    <input type="file" id="imageInput" accept="image/*" style="display: none;">
+                </div>
+                <div id="imagePreview" style="margin-top: 20px; text-align: center;"></div>
+            </div>
 
-    <!-- Crop Selection -->
-    <label class="block mb-2 text-lg font-medium text-gray-700">Select Crop</label>
-    <select class="w-full p-2 border rounded-lg mb-4">
-      <option>Wheat</option>
-      <option>Rice</option>
-      <option>Maize</option>
-      <option>Corn</option>
-      <option>Potato</option>
-      <option>Sugarcane</option>
-      <option>Banana</option>
-      <option>Tomato</option>
-      <option>Cotton</option>
-      <option>Soyabean</option>
-      <option>Turmeric</option>
-      <option>Toor Dal (Pigeon Pea)</option>
-      <option>Bajra</option>
-    </select>
+            <!-- Step 3: Optional Inputs -->
+            <div class="step">
+                <h3><span class="step-number">3</span>Optional Parameters (for LAI calculation)</h3>
+                <div class="optional-inputs">
+                    <div class="input-group">
+                        <label for="cmPerPixel">CM per Pixel</label>
+                        <input type="number" id="cmPerPixel" placeholder="e.g., 0.1" step="0.01">
+                        <small style="color: #666;">Helps calculate actual leaf dimensions</small>
+                    </div>
+                    <div class="input-group">
+                        <label for="groundArea">Ground Area (m²)</label>
+                        <input type="number" id="groundArea" placeholder="e.g., 1.0" step="0.1">
+                        <small style="color: #666;">Area covered by the plant canopy</small>
+                    </div>
+                </div>
+            </div>
 
-    <!-- Image Upload -->
-    <label class="block mb-2 text-lg font-medium text-gray-700">Upload Leaf Image</label>
-    <input type="file" class="w-full p-2 border rounded-lg mb-6">
+            <!-- Step 4: Analyze -->
+            <div class="step" style="text-align: center;">
+                <h3><span class="step-number">4</span>AI Analysis</h3>
+                <button class="analyze-btn" id="analyzeBtn" disabled>
+                    🔍 Analyze Leaf Health
+                </button>
+                <div class="progress-bar hidden" id="progressBar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <p id="analysisStatus" style="margin-top: 15px; font-style: italic; color: #666;"></p>
+            </div>
 
-    <!-- Submit Button -->
-    <button class="w-full bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-lg font-semibold">
-      Analyze Leaf
-    </button>
-  </div>
+            <!-- Results Section -->
+            <div class="results-section" id="resultsSection">
+                <h3 style="color: #2c5530; margin-bottom: 20px;">📊 Analysis Results</h3>
+                
+                <div class="results-grid">
+                    <div class="result-card">
+                        <h4>Crop Identified</h4>
+                        <div class="result-value" id="cropResult">-</div>
+                    </div>
+                    
+                    <div class="result-card">
+                        <h4>Health Status</h4>
+                        <div class="result-value">
+                            <span class="health-status" id="healthStatus">-</span>
+                        </div>
+                    </div>
+                    
+                    <div class="result-card">
+                        <h4>Damage Percentage</h4>
+                        <div class="result-value" id="damagePercent">-</div>
+                    </div>
+                    
+                    <div class="result-card">
+                        <h4>Severity Level</h4>
+                        <div class="result-value">
+                            <span class="severity" id="severityLevel">-</span>
+                        </div>
+                    </div>
+                    
+                    <div class="result-card">
+                        <h4>Leaf Area Index (LAI)</h4>
+                        <div class="result-value" id="laiValue">-</div>
+                    </div>
+                    
+                    <div class="result-card">
+                        <h4>Confidence Score</h4>
+                        <div class="result-value" id="confidence">-</div>
+                    </div>
+                </div>
 
-  <!-- Results Section -->
-  <div class="max-w-3xl mx-auto mt-8 p-6 bg-white rounded-xl shadow-lg">
-    <h2 class="text-xl font-bold mb-4">Results</h2>
-    <ul class="space-y-2 text-gray-700">
-      <li>🌿 <b>Health Status:</b> Healthy</li>
-      <li>⚡ <b>Damage %:</b> 15%</li>
-      <li>📊 <b>Severity:</b> Mild</li>
-      <li>📐 <b>Leaf Area Index (LAI):</b> 2.1</li>
-      <li>💡 <b>Recommendation:</b> No treatment required. Maintain watering.</li>
-    </ul>
+                <div class="recommendations">
+                    <h4 style="color: #2c5530; margin-bottom: 15px;">💡 Treatment Recommendations</h4>
+                    <div id="recommendationText">Analysis will provide specific treatment recommendations based on detected issues.</div>
+                </div>
 
-    <!-- Voice Output Button -->
-    <button class="mt-6 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg font-semibold">
-      🔊 Hear Report
-    </button>
-  </div>
-
-  <!-- Footer -->
-  <div class="text-center text-gray-500 text-sm mt-6 mb-4">
-    © 2025 Smart AgriTech Hackathon | Team AI Farmers
-  </div>
-
+                <div class="voice-controls">
+                    <h4 style="color: #2c5530; margin-bottom: 15px;">🔊 Voice Summary</h4>
+                    <button class="voice-btn" id="voiceEnglish">🇬🇧 English</button>
+                    <button class="voice-btn" id="voiceMarathi">🇮🇳 मराठी</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
