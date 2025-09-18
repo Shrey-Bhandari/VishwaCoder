@@ -20,6 +20,7 @@ const translations = {
     detectedDisease: "Detected Disease",
     recommendation: "Treatment Recommendation",
     voiceReport: "🔊 Hear Voice Report",
+    stopAudio: "⏹️ Stop Audio",
     footer: "© 2025 Smart AgriTech Platform | Empowering Farmers with AI",
     analyzing: "🔄 Analyzing...",
     uploadFirst: "Please upload an image first!",
@@ -46,6 +47,7 @@ const translations = {
     detectedDisease: "पहचाना गया रोग",
     recommendation: "उपचार सिफारिश",
     voiceReport: "🔊 आवाज रिपोर्ट सुनें",
+    stopAudio: "⏹️ ऑडियो रोकें",
     footer:
       "© 2025 स्मार्ट कृषि तकनीक प्लेटफॉर्म | एआई के साथ किसानों को सशक्त बनाना",
     analyzing: "🔄 विश्लेषण हो रहा है...",
@@ -73,11 +75,12 @@ const translations = {
     detectedDisease: "ओळखला गेलेला रोग",
     recommendation: "उपचार शिफारस",
     voiceReport: "🔊 आवाज अहवाल ऐका",
+    stopAudio: "⏹️ ऑडिओ थांबवा",
     footer:
       "© 2025 स्मार्ट कृषी तंत्रज्ञान प्लॅटफॉर्म | एआयसह शेतकऱ्यांना सक्षम करणे",
     analyzing: "🔄 विश्लेषण सुरू आहे...",
     uploadFirst: "कृपया प्रथम प्रतिमा अपलोड करा!",
-    viewNewWindow: "📊 नवीन विंडोमध्ये पहा",
+    viewNewWindow: "📊 नविन विंडोमध्ये पहा",
     exportPDF: "📄 पीडीएफ निर्यात करा",
   },
 };
@@ -85,6 +88,7 @@ const translations = {
 let currentLang = "en";
 let selectedModel = null;
 let analysisResults = null;
+let currentUtterance = null; // Store current speech utterance
 
 // Initialize page
 document.addEventListener("DOMContentLoaded", function () {
@@ -123,22 +127,28 @@ function updateContent() {
   });
 
   // Update results section labels
-  document.getElementById("health-label").textContent = t.healthStatus;
-  document.getElementById("damage-label").textContent = t.damagePercent;
-  document.getElementById("severity-label").textContent = t.severity;
-  document.getElementById("lai-label").textContent = t.leafAreaIndex;
-  document.getElementById("disease-label").textContent = t.detectedDisease;
-  document.getElementById("recommendation-label").textContent =
-    t.recommendation;
+  if (document.getElementById("health-label")) {
+    document.getElementById("health-label").textContent = t.healthStatus;
+    document.getElementById("damage-label").textContent = t.damagePercent;
+    document.getElementById("severity-label").textContent = t.severity;
+    document.getElementById("lai-label").textContent = t.leafAreaIndex;
+    document.getElementById("disease-label").textContent = t.detectedDisease;
+    document.getElementById("recommendation-label").textContent =
+      t.recommendation;
+  }
 
+  // Update voice buttons
   if (document.getElementById("voice-btn")) {
     document.getElementById("voice-btn").textContent = t.voiceReport;
+  }
+  if (document.getElementById("stop-voice-btn")) {
+    document.getElementById("stop-voice-btn").textContent = t.stopAudio;
   }
 
   document.getElementById("footer-text").textContent = t.footer;
 
   // Update results if visible
-  if (analysisResults) {
+  if (analysisResults && document.getElementById("results-title")) {
     document.getElementById("results-title").textContent = t.resultsTitle;
   }
 }
@@ -175,47 +185,64 @@ function analyzeLeaf(modelId) {
     return;
   }
 
-  // Show loading state
   const analyzeBtn = document.getElementById(`btn-${modelId}`);
   analyzeBtn.innerHTML = translations[currentLang].analyzing;
   analyzeBtn.disabled = true;
 
-  // Here you would integrate with your actual ML model
-  // For now, this is a placeholder that shows the UI structure
+  const formData = new FormData();
+  formData.append("image", fileInput.files[0]);
+  formData.append("model", modelId);
 
-  // Simulate API call delay
-  setTimeout(() => {
-    // TODO: Replace this with actual API call to your ML model
-    // Example API call structure:
-    /*
-    const formData = new FormData();
-    formData.append('image', fileInput.files[0]);
-    formData.append('model', modelId);
-    
-    fetch('/api/analyze-leaf', {
-      method: 'POST',
-      body: formData
+  console.log("🔍 Starting analysis for model:", modelId);
+  console.log("📁 File selected:", fileInput.files[0].name);
+
+  fetch("http://127.0.0.1:5000/api/analyze-leaf", {
+    method: "POST",
+    body: formData,
+  })
+    .then((response) => {
+      console.log("📡 Response status:", response.status);
+      console.log("📡 Response ok:", response.ok);
+
+      if (!response.ok) {
+        return response.text().then((text) => {
+          console.error("❌ Error response:", text);
+          throw new Error(`HTTP ${response.status}: ${text}`);
+        });
+      }
+
+      return response.json();
     })
-    .then(response => response.json())
-    .then(data => {
+    .then((data) => {
+      console.log("✅ Success response:", data);
+
+      if (data.error) {
+        console.error("❌ API Error:", data.error);
+        throw new Error(data.error);
+      }
+
       displayResults(data);
     })
-    .catch(error => {
-      console.error('Error:', error);
-      alert('Analysis failed. Please try again.');
+    .catch((error) => {
+      console.error("💥 Full error:", error);
+
+      // Show detailed error message
+      let errorMsg = "Analysis failed: ";
+      if (error.message.includes("fetch")) {
+        errorMsg +=
+          "Cannot connect to server. Is the backend running on port 5000?";
+      } else if (error.message.includes("CORS")) {
+        errorMsg += "CORS error. Check backend CORS configuration.";
+      } else {
+        errorMsg += error.message;
+      }
+
+      alert(errorMsg);
     })
     .finally(() => {
       analyzeBtn.innerHTML = translations[currentLang].analyzeButton;
       analyzeBtn.disabled = false;
     });
-    */
-
-    // For demonstration purposes, showing UI structure
-    alert("Integration point: Connect your trained .h5 model here");
-
-    analyzeBtn.innerHTML = translations[currentLang].analyzeButton;
-    analyzeBtn.disabled = false;
-  }, 1000);
 }
 
 function displayResults(results) {
@@ -245,14 +272,51 @@ function displayResults(results) {
 
 function speakResults() {
   if ("speechSynthesis" in window && analysisResults) {
+    // Stop any existing speech first
+    stopSpeaking();
+
     const text = `Health Status: ${analysisResults.healthStatus}. Damage: ${analysisResults.damagePercentage} percent. Severity: ${analysisResults.severityLevel}. Recommendation: ${analysisResults.recommendation}`;
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang =
+
+    currentUtterance = new SpeechSynthesisUtterance(text);
+    currentUtterance.lang =
       currentLang === "hi" ? "hi-IN" : currentLang === "mr" ? "mr-IN" : "en-US";
-    speechSynthesis.speak(utterance);
+
+    // Show stop button and hide speak button when speaking starts
+    currentUtterance.onstart = function () {
+      document.getElementById("voice-btn").style.display = "none";
+      document.getElementById("stop-voice-btn").style.display = "inline-block";
+    };
+
+    // Show speak button and hide stop button when speech ends
+    currentUtterance.onend = function () {
+      document.getElementById("voice-btn").style.display = "inline-block";
+      document.getElementById("stop-voice-btn").style.display = "none";
+      currentUtterance = null;
+    };
+
+    // Handle speech errors
+    currentUtterance.onerror = function (event) {
+      console.error("Speech synthesis error:", event.error);
+      document.getElementById("voice-btn").style.display = "inline-block";
+      document.getElementById("stop-voice-btn").style.display = "none";
+      currentUtterance = null;
+    };
+
+    speechSynthesis.speak(currentUtterance);
   } else {
     alert("Speech synthesis not supported in this browser");
   }
+}
+
+function stopSpeaking() {
+  if (speechSynthesis.speaking || speechSynthesis.pending) {
+    speechSynthesis.cancel();
+  }
+
+  // Reset button states
+  document.getElementById("voice-btn").style.display = "inline-block";
+  document.getElementById("stop-voice-btn").style.display = "none";
+  currentUtterance = null;
 }
 
 function openResultsWindow() {
@@ -314,7 +378,7 @@ function openResultsWindow() {
           </div>
           
           <div class="bg-green-50 p-6 rounded-lg">
-            <h3 class="font-semibent text-gray-700 mb-2">${t.leafAreaIndex}</h3>
+            <h3 class="font-semibold text-gray-700 mb-2">${t.leafAreaIndex}</h3>
             <p class="text-2xl font-bold text-green-600">${
               analysisResults.leafAreaIndex || "-"
             }</p>

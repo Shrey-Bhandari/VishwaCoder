@@ -250,11 +250,16 @@
             </div>
           </div>
 
-          <!-- Voice Report Button -->
-          <div class="text-center">
+          <!-- Voice Report Buttons -->
+          <div class="text-center space-x-4">
             <button id="voice-btn" onclick="speakResults()"
               class="bg-gradient-to-r from-teal-500 to-cyan-500 hover:from-teal-600 hover:to-cyan-600 text-white py-3 px-8 rounded-xl font-semibold shadow-lg transform transition-all duration-200 hover:scale-105">
               🔊 Hear Voice Report
+            </button>
+            <button id="stop-voice-btn" onclick="stopSpeaking()"
+              class="bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-white py-3 px-8 rounded-xl font-semibold shadow-lg transform transition-all duration-200 hover:scale-105"
+              style="display: none;">
+              ⏹️ Stop Audio
             </button>
           </div>
         </div>
@@ -282,7 +287,6 @@
       </div>
     </div>
   </footer>
-
 </body>
 
 </html>

@@ -5,7 +5,7 @@ Production server startup script for AI Leaf Health Assessment Backend
 import os
 import sys
 import logging
-from app import app, initialize_models
+from server import app, initialize_models
 
 def setup_logging():
     """Setup comprehensive logging"""
