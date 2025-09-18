@@ -63,7 +63,7 @@ Before you begin, ensure you have the following installed:
 
 1.  **Start the server:**
     ```bash
-    python app.py  # or whatever your main server file is
+    python server.py  # or whatever your main server file is
     ```
 
 2.  **Open your web browser** and navigate to `http://127.0.0.1:5000` (or the address shown in your terminal).
