@@ -1,236 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>AI Leaf Health Assessment</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    // Language translations
-    const translations = {
-      en: {
-        title: "AI-Driven Leaf Health Assessment",
-        subtitle: "Damage Quantification • Leaf Area Index • Recommendations",
-        selectLanguage: "Select Language",
-        model1Title: "Cereal Crops Analysis",
-        model1Desc: "Specialized for Rice & Wheat disease detection",
-        model2Title: "Legume & Fruit Crops Analysis", 
-        model2Desc: "Advanced detection for Soybean, Banana, Potato & Tomato",
-        model3Title: "Cash Crops Analysis",
-        model3Desc: "Expert analysis for Cotton, Sugarcane & Turmeric",
-        model4Title: "Other Crops Analysis",
-        model4Desc: "General analysis for Maize, Bajra & Toor Dal",
-        uploadImage: "Upload Leaf Image",
-        analyzeButton: "🔍 Analyze Leaf Health",
-        resultsTitle: "Analysis Results",
-        healthStatus: "Health Status",
-        damagePercent: "Damage Percentage",
-        severity: "Severity Level",
-        leafAreaIndex: "Leaf Area Index (LAI)",
-        recommendation: "Treatment Recommendation",
-        voiceReport: "🔊 Hear Voice Report",
-        footer: "© 2025 Smart AgriTech Platform | Empowering Farmers with AI"
-      },
-      hi: {
-        title: "एआई-संचालित पत्ती स्वास्थ्य मूल्यांकन",
-        subtitle: "क्षति मात्रा निर्धारण • पत्ती क्षेत्र सूचकांक • सिफारिशें",
-        selectLanguage: "भाषा चुनें",
-        model1Title: "अनाज फसल विश्लेषण",
-        model1Desc: "चावल और गेहूं रोग पहचान के लिए विशेष",
-        model2Title: "दलहन और फल फसल विश्लेषण",
-        model2Desc: "सोयाबीन, केला, आलू और टमाटर के लिए उन्नत पहचान",
-        model3Title: "नकदी फसल विश्लेषण", 
-        model3Desc: "कपास, गन्ना और हल्दी के लिए विशेषज्ञ विश्लेषण",
-        model4Title: "अन्य फसल विश्लेषण",
-        model4Desc: "मक्का, बाजरा और तूर दाल के लिए सामान्य विश्लेषण",
-        uploadImage: "पत्ती की तस्वीर अपलोड करें",
-        analyzeButton: "🔍 पत्ती स्वास्थ्य का विश्लेषण करें",
-        resultsTitle: "विश्लेषण परिणाम",
-        healthStatus: "स्वास्थ्य स्थिति",
-        damagePercent: "क्षति प्रतिशत",
-        severity: "गंभीरता स्तर",
-        leafAreaIndex: "पत्ती क्षेत्र सूचकांक (LAI)",
-        recommendation: "उपचार सिफारिश",
-        voiceReport: "🔊 आवाज रिपोर्ट सुनें",
-        footer: "© 2025 स्मार्ट कृषि तकनीक प्लेटफॉर्म | एआई के साथ किसानों को सशक्त बनाना"
-      },
-      mr: {
-        title: "एआय-चालित पानांचे आरोग्य मूल्यमापन",
-        subtitle: "नुकसान प्रमाण • पान क्षेत्र निर्देशांक • शिफारसी",
-        selectLanguage: "भाषा निवडा",
-        model1Title: "धान्य पीक विश्लेषण",
-        model1Desc: "तांदूळ आणि गहू रोग ओळख साठी विशेष",
-        model2Title: "डाळी आणि फळ पीक विश्लेषण",
-        model2Desc: "सोयाबीन, केळी, बटाटा आणि टोमॅटो साठी प्रगत ओळख",
-        model3Title: "नगदी पीक विश्लेषण",
-        model3Desc: "कापूस, ऊस आणि हळद साठी तज्ञ विश्लेषण", 
-        model4Title: "इतर पीक विश्लेषण",
-        model4Desc: "मक्का, बाजरी आणि तूर डाळ साठी सामान्य विश्लेषण",
-        uploadImage: "पानाचा फोटो अपलोड करा",
-        analyzeButton: "🔍 पानांच्या आरोग्याचे विश्लेषण करा",
-        resultsTitle: "विश्लेषण परिणाम",
-        healthStatus: "आरोग्य स्थिती",
-        damagePercent: "नुकसान टक्केवारी",
-        severity: "तीव्रता पातळी",
-        leafAreaIndex: "पान क्षेत्र निर्देशांक (LAI)",
-        recommendation: "उपचार शिफारस",
-        voiceReport: "🔊 आवाज अहवाल ऐका",
-        footer: "© 2025 स्मार्ट कृषी तंत्रज्ञान प्लॅटफॉर्म | एआयसह शेतकऱ्यांना सक्षम करणे"
-      }
-    };
-
-    let currentLang = 'en';
-    let selectedModel = null;
-    let analysisResults = null;
-
-    // Crop model mappings
-    const cropModels = {
-      model1: ['rice', 'wheat'],
-      model2: ['soybean', 'banana', 'potato', 'tomato'], 
-      model3: ['cotton', 'sugarcane', 'turmeric'],
-      model4: ['maize', 'bajra', 'toor-dal']
-    };
-
-    function changeLanguage(lang) {
-      currentLang = lang;
-      updateContent();
-    }
-
-    function updateContent() {
-      const t = translations[currentLang];
-      document.getElementById('main-title').textContent = t.title;
-      document.getElementById('main-subtitle').textContent = t.subtitle;
-      document.getElementById('lang-label').textContent = t.selectLanguage;
-      
-      // Update model cards
-      document.getElementById('model1-title').textContent = t.model1Title;
-      document.getElementById('model1-desc').textContent = t.model1Desc;
-      document.getElementById('model2-title').textContent = t.model2Title;
-      document.getElementById('model2-desc').textContent = t.model2Desc;
-      document.getElementById('model3-title').textContent = t.model3Title;
-      document.getElementById('model3-desc').textContent = t.model3Desc;
-      document.getElementById('model4-title').textContent = t.model4Title;
-      document.getElementById('model4-desc').textContent = t.model4Desc;
-      
-      // Update upload sections
-      document.querySelectorAll('.upload-label').forEach(el => {
-        el.textContent = t.uploadImage;
-      });
-      document.querySelectorAll('.analyze-btn').forEach(el => {
-        el.textContent = t.analyzeButton;
-      });
-      
-      document.getElementById('footer-text').textContent = t.footer;
-      
-      // Update results if visible
-      if (analysisResults) {
-        updateResultsDisplay();
-      }
-    }
-
-    function selectModel(modelId) {
-      selectedModel = modelId;
-      
-      // Hide all upload sections
-      document.querySelectorAll('.upload-section').forEach(section => {
-        section.classList.add('hidden');
-      });
-      
-      // Remove active state from all cards
-      document.querySelectorAll('.model-card').forEach(card => {
-        card.classList.remove('ring-4', 'ring-emerald-400', 'bg-emerald-50');
-        card.classList.add('bg-white');
-      });
-      
-      // Show selected upload section and highlight card
-      document.getElementById(`upload-${modelId}`).classList.remove('hidden');
-      document.getElementById(`card-${modelId}`).classList.add('ring-4', 'ring-emerald-400', 'bg-emerald-50');
-      document.getElementById(`card-${modelId}`).classList.remove('bg-white');
-      
-      // Hide results
-      document.getElementById('results-section').classList.add('hidden');
-    }
-
-    function analyzeLeaf(modelId) {
-      const fileInput = document.getElementById(`file-${modelId}`);
-      if (!fileInput.files.length) {
-        alert('Please upload an image first!');
-        return;
-      }
-      
-      // Simulate analysis with loading
-      const analyzeBtn = document.getElementById(`btn-${modelId}`);
-      analyzeBtn.innerHTML = '🔄 Analyzing...';
-      analyzeBtn.disabled = true;
-      
-      setTimeout(() => {
-        // Mock results based on model
-        const results = generateMockResults(modelId);
-        displayResults(results);
-        
-        analyzeBtn.innerHTML = translations[currentLang].analyzeButton;
-        analyzeBtn.disabled = false;
-      }, 3000);
-    }
-
-    function generateMockResults(modelId) {
-      const diseases = {
-        model1: ['Leaf Blast', 'Brown Spot', 'Bacterial Blight'],
-        model2: ['Mosaic Virus', 'Black Spot', 'Early Blight'],
-        model3: ['Bollworm', 'Red Rot', 'Leaf Spot'],
-        model4: ['Common Rust', 'Downy Mildew', 'Purple Blotch']
-      };
-      
-      const recommendations = {
-        model1: 'Apply fungicide spray and improve drainage',
-        model2: 'Use resistant varieties and copper-based fungicides', 
-        model3: 'Implement IPM practices and biological control',
-        model4: 'Ensure proper spacing and use organic treatments'
-      };
-      
-      return {
-        healthStatus: Math.random() > 0.3 ? 'Diseased' : 'Healthy',
-        damage: Math.floor(Math.random() * 40) + 10,
-        severity: Math.random() > 0.5 ? 'Moderate' : 'Mild',
-        lai: (Math.random() * 3 + 1).toFixed(1),
-        disease: diseases[modelId][Math.floor(Math.random() * diseases[modelId].length)],
-        recommendation: recommendations[modelId]
-      };
-    }
-
-    function displayResults(results) {
-      analysisResults = results;
-      updateResultsDisplay();
-      document.getElementById('results-section').classList.remove('hidden');
-      document.getElementById('results-section').scrollIntoView({ behavior: 'smooth' });
-    }
-
-    function updateResultsDisplay() {
-      const t = translations[currentLang];
-      document.getElementById('results-title').textContent = t.resultsTitle;
-      document.getElementById('health-value').textContent = analysisResults.healthStatus;
-      document.getElementById('damage-value').textContent = analysisResults.damage + '%';
-      document.getElementById('severity-value').textContent = analysisResults.severity;
-      document.getElementById('lai-value').textContent = analysisResults.lai;
-      document.getElementById('disease-value').textContent = analysisResults.disease || 'None detected';
-      document.getElementById('recommendation-value').textContent = analysisResults.recommendation;
-      document.getElementById('voice-btn').textContent = t.voiceReport;
-    }
-
-    function speakResults() {
-      if ('speechSynthesis' in window && analysisResults) {
-        const text = `Health Status: ${analysisResults.healthStatus}. Damage: ${analysisResults.damage} percent. Recommendation: ${analysisResults.recommendation}`;
-        const utterance = new SpeechSynthesisUtterance(text);
-        speechSynthesis.speak(utterance);
-      }
-    }
-
-    // Initialize page
-    document.addEventListener('DOMContentLoaded', function() {
-      updateContent();
-    });
-  </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="app.js"></script>
 </head>
+
 <body class="bg-gradient-to-br from-emerald-50 to-teal-100 min-h-screen">
 
   <!-- Header -->
@@ -238,14 +17,17 @@
     <div class="container mx-auto px-4 py-6">
       <div class="flex flex-col md:flex-row justify-between items-center">
         <div class="text-center md:text-left">
-          <h1 id="main-title" class="text-3xl md:text-4xl font-bold tracking-tight">AI-Driven Leaf Health Assessment</h1>
-          <p id="main-subtitle" class="text-emerald-100 mt-2 text-sm md:text-base">Damage Quantification • Leaf Area Index • Recommendations</p>
+          <h1 id="main-title" class="text-3xl md:text-4xl font-bold tracking-tight">AI-Driven Leaf Health Assessment
+          </h1>
+          <p id="main-subtitle" class="text-emerald-100 mt-2 text-sm md:text-base">Damage Quantification • Leaf Area
+            Index • Recommendations</p>
         </div>
-        
+
         <!-- Language Selector -->
         <div class="mt-4 md:mt-0">
           <label id="lang-label" class="block text-sm font-medium mb-2">Select Language</label>
-          <select onchange="changeLanguage(this.value)" class="bg-white text-gray-800 px-4 py-2 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-emerald-300">
+          <select onchange="changeLanguage(this.value)"
+            class="bg-white text-gray-800 px-4 py-2 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-emerald-300">
             <option value="en">🇬🇧 English</option>
             <option value="hi">🇮🇳 हिंदी</option>
             <option value="mr">🇮🇳 मराठी</option>
@@ -257,68 +39,71 @@
 
   <div class="container mx-auto px-4 py-8">
     <!-- Model Selection Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-      
-      <!-- Model 1: Rice & Wheat -->
-      <div id="card-model1" class="model-card bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer transform hover:scale-105" onclick="selectModel('model1')">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+
+      <!-- Model 1: Multi-Crop Analysis -->
+      <div id="card-model1"
+        class="model-card bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer transform hover:scale-105"
+        onclick="selectModel('model1')">
         <div class="text-center">
-          <div class="bg-amber-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+          <div
+            class="bg-gradient-to-br from-red-100 to-orange-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+            <span class="text-3xl">🍎</span>
+          </div>
+          <h3 id="model1-title" class="text-xl font-bold text-gray-800 mb-2">Multi-Crop Analysis</h3>
+          <p id="model1-desc" class="text-gray-600 text-sm mb-4">Advanced detection for fruits, vegetables & field crops
+          </p>
+          <div class="flex flex-wrap gap-1 justify-center">
+            <span class="bg-red-100 text-red-800 px-2 py-1 rounded-full text-xs">Apple</span>
+            <span class="bg-red-100 text-red-800 px-2 py-1 rounded-full text-xs">Cherry</span>
+            <span class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs">Corn</span>
+            <span class="bg-purple-100 text-purple-800 px-2 py-1 rounded-full text-xs">Grapes</span>
+            <span class="bg-orange-100 text-orange-800 px-2 py-1 rounded-full text-xs">Peach</span>
+            <span class="bg-orange-100 text-orange-800 px-2 py-1 rounded-full text-xs">Orange</span>
+            <span class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs">Pepper Bell</span>
+            <span class="bg-amber-100 text-amber-800 px-2 py-1 rounded-full text-xs">Potato</span>
+            <span class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs">Soybean</span>
+            <span class="bg-red-100 text-red-800 px-2 py-1 rounded-full text-xs">Raspberry</span>
+            <span class="bg-red-100 text-red-800 px-2 py-1 rounded-full text-xs">Strawberry</span>
+            <span class="bg-red-100 text-red-800 px-2 py-1 rounded-full text-xs">Tomato</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Model 2: Staple Crops Analysis -->
+      <div id="card-model2"
+        class="model-card bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer transform hover:scale-105"
+        onclick="selectModel('model2')">
+        <div class="text-center">
+          <div
+            class="bg-gradient-to-br from-amber-100 to-yellow-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
             <span class="text-3xl">🌾</span>
           </div>
-          <h3 id="model1-title" class="text-xl font-bold text-gray-800 mb-2">Cereal Crops Analysis</h3>
-          <p id="model1-desc" class="text-gray-600 text-sm mb-4">Specialized for Rice & Wheat disease detection</p>
+          <h3 id="model2-title" class="text-xl font-bold text-gray-800 mb-2">Staple Crops Analysis</h3>
+          <p id="model2-desc" class="text-gray-600 text-sm mb-4">Specialized for major grain and cash crops</p>
           <div class="flex flex-wrap gap-1 justify-center">
-            <span class="bg-amber-100 text-amber-800 px-2 py-1 rounded-full text-xs">Rice</span>
             <span class="bg-amber-100 text-amber-800 px-2 py-1 rounded-full text-xs">Wheat</span>
+            <span class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs">Maize</span>
+            <span class="bg-gray-100 text-gray-800 px-2 py-1 rounded-full text-xs">Cotton</span>
+            <span class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs">Sugarcane</span>
+            <span class="bg-amber-100 text-amber-800 px-2 py-1 rounded-full text-xs">Rice</span>
           </div>
         </div>
       </div>
 
-      <!-- Model 2: Soybean, Banana, Potato, Tomato -->
-      <div id="card-model2" class="model-card bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer transform hover:scale-105" onclick="selectModel('model2')">
+      <!-- Model 3: Banana Analysis -->
+      <div id="card-model3"
+        class="model-card bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer transform hover:scale-105"
+        onclick="selectModel('model3')">
         <div class="text-center">
-          <div class="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-            <span class="text-3xl">🫛</span>
+          <div
+            class="bg-gradient-to-br from-yellow-100 to-orange-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+            <span class="text-3xl">🍌</span>
           </div>
-          <h3 id="model2-title" class="text-xl font-bold text-gray-800 mb-2">Legume & Fruit Crops Analysis</h3>
-          <p id="model2-desc" class="text-gray-600 text-sm mb-4">Advanced detection for Soybean, Banana, Potato & Tomato</p>
+          <h3 id="model3-title" class="text-xl font-bold text-gray-800 mb-2">Banana Crop Analysis</h3>
+          <p id="model3-desc" class="text-gray-600 text-sm mb-4">Specialized banana disease detection and analysis</p>
           <div class="flex flex-wrap gap-1 justify-center">
-            <span class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs">Soybean</span>
-            <span class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs">Banana</span>
-            <span class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs">Potato</span>
-            <span class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs">Tomato</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Model 3: Cotton, Sugarcane, Turmeric -->
-      <div id="card-model3" class="model-card bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer transform hover:scale-105" onclick="selectModel('model3')">
-        <div class="text-center">
-          <div class="bg-purple-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-            <span class="text-3xl">🌿</span>
-          </div>
-          <h3 id="model3-title" class="text-xl font-bold text-gray-800 mb-2">Cash Crops Analysis</h3>
-          <p id="model3-desc" class="text-gray-600 text-sm mb-4">Expert analysis for Cotton, Sugarcane & Turmeric</p>
-          <div class="flex flex-wrap gap-1 justify-center">
-            <span class="bg-purple-100 text-purple-800 px-2 py-1 rounded-full text-xs">Cotton</span>
-            <span class="bg-purple-100 text-purple-800 px-2 py-1 rounded-full text-xs">Sugarcane</span>
-            <span class="bg-purple-100 text-purple-800 px-2 py-1 rounded-full text-xs">Turmeric</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Model 4: Maize, Bajra, Toor Dal -->
-      <div id="card-model4" class="model-card bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer transform hover:scale-105" onclick="selectModel('model4')">
-        <div class="text-center">
-          <div class="bg-orange-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-            <span class="text-3xl">🌽</span>
-          </div>
-          <h3 id="model4-title" class="text-xl font-bold text-gray-800 mb-2">Other Crops Analysis</h3>
-          <p id="model4-desc" class="text-gray-600 text-sm mb-4">General analysis for Maize, Bajra & Toor Dal</p>
-          <div class="flex flex-wrap gap-1 justify-center">
-            <span class="bg-orange-100 text-orange-800 px-2 py-1 rounded-full text-xs">Maize (Corn)</span>
-            <span class="bg-orange-100 text-orange-800 px-2 py-1 rounded-full text-xs">Bajra</span>
-            <span class="bg-orange-100 text-orange-800 px-2 py-1 rounded-full text-xs">Toor Dal</span>
+            <span class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs">Banana</span>
           </div>
         </div>
       </div>
@@ -327,19 +112,22 @@
     <!-- Upload Sections (Initially Hidden) -->
     <!-- Model 1 Upload -->
     <div id="upload-model1" class="upload-section hidden max-w-2xl mx-auto">
-      <div class="bg-white rounded-2xl p-8 shadow-xl border-2 border-amber-200">
+      <div class="bg-white rounded-2xl p-8 shadow-xl border-2 border-red-200">
         <div class="text-center mb-6">
-          <div class="bg-amber-100 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4">
-            <span class="text-4xl">🌾</span>
+          <div
+            class="bg-gradient-to-br from-red-100 to-orange-100 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4">
+            <span class="text-4xl">🍎</span>
           </div>
-          <h2 class="text-2xl font-bold text-gray-800 mb-2">Cereal Crops Analysis</h2>
-          <p class="text-gray-600">Upload rice or wheat leaf images for specialized disease detection</p>
+          <h2 class="text-2xl font-bold text-gray-800 mb-2">Multi-Crop Analysis</h2>
+          <p class="text-gray-600">Upload leaf images for fruits, vegetables, and field crops analysis</p>
         </div>
-        
+
         <div class="space-y-4">
           <label class="upload-label block text-lg font-medium text-gray-700">Upload Leaf Image</label>
-          <input id="file-model1" type="file" accept="image/*" class="w-full p-4 border-2 border-dashed border-amber-300 rounded-lg bg-amber-50 hover:bg-amber-100 transition-colors">
-          <button id="btn-model1" onclick="analyzeLeaf('model1')" class="analyze-btn w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white py-4 px-6 rounded-lg font-semibold shadow-lg transform transition-all duration-200 hover:scale-105">
+          <input id="file-model1" type="file" accept="image/*"
+            class="w-full p-4 border-2 border-dashed border-red-300 rounded-lg bg-red-50 hover:bg-red-100 transition-colors">
+          <button id="btn-model1" onclick="analyzeLeaf('model1')"
+            class="analyze-btn w-full bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 text-white py-4 px-6 rounded-lg font-semibold shadow-lg transform transition-all duration-200 hover:scale-105">
             🔍 Analyze Leaf Health
           </button>
         </div>
@@ -348,19 +136,22 @@
 
     <!-- Model 2 Upload -->
     <div id="upload-model2" class="upload-section hidden max-w-2xl mx-auto">
-      <div class="bg-white rounded-2xl p-8 shadow-xl border-2 border-green-200">
+      <div class="bg-white rounded-2xl p-8 shadow-xl border-2 border-amber-200">
         <div class="text-center mb-6">
-          <div class="bg-green-100 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4">
-            <span class="text-4xl">🫛</span>
+          <div
+            class="bg-gradient-to-br from-amber-100 to-yellow-100 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4">
+            <span class="text-4xl">🌾</span>
           </div>
-          <h2 class="text-2xl font-bold text-gray-800 mb-2">Legume & Fruit Crops Analysis</h2>
-          <p class="text-gray-600">Advanced analysis for soybean, banana, potato & tomato crops</p>
+          <h2 class="text-2xl font-bold text-gray-800 mb-2">Staple Crops Analysis</h2>
+          <p class="text-gray-600">Advanced analysis for wheat, maize, cotton, sugarcane, and rice</p>
         </div>
-        
+
         <div class="space-y-4">
           <label class="upload-label block text-lg font-medium text-gray-700">Upload Leaf Image</label>
-          <input id="file-model2" type="file" accept="image/*" class="w-full p-4 border-2 border-dashed border-green-300 rounded-lg bg-green-50 hover:bg-green-100 transition-colors">
-          <button id="btn-model2" onclick="analyzeLeaf('model2')" class="analyze-btn w-full bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white py-4 px-6 rounded-lg font-semibold shadow-lg transform transition-all duration-200 hover:scale-105">
+          <input id="file-model2" type="file" accept="image/*"
+            class="w-full p-4 border-2 border-dashed border-amber-300 rounded-lg bg-amber-50 hover:bg-amber-100 transition-colors">
+          <button id="btn-model2" onclick="analyzeLeaf('model2')"
+            class="analyze-btn w-full bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-white py-4 px-6 rounded-lg font-semibold shadow-lg transform transition-all duration-200 hover:scale-105">
             🔍 Analyze Leaf Health
           </button>
         </div>
@@ -369,40 +160,22 @@
 
     <!-- Model 3 Upload -->
     <div id="upload-model3" class="upload-section hidden max-w-2xl mx-auto">
-      <div class="bg-white rounded-2xl p-8 shadow-xl border-2 border-purple-200">
+      <div class="bg-white rounded-2xl p-8 shadow-xl border-2 border-yellow-200">
         <div class="text-center mb-6">
-          <div class="bg-purple-100 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4">
-            <span class="text-4xl">🌿</span>
+          <div
+            class="bg-gradient-to-br from-yellow-100 to-orange-100 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4">
+            <span class="text-4xl">🍌</span>
           </div>
-          <h2 class="text-2xl font-bold text-gray-800 mb-2">Cash Crops Analysis</h2>
-          <p class="text-gray-600">Expert analysis for cotton, sugarcane & turmeric cultivation</p>
+          <h2 class="text-2xl font-bold text-gray-800 mb-2">Banana Crop Analysis</h2>
+          <p class="text-gray-600">Specialized analysis for banana leaf diseases and health assessment</p>
         </div>
-        
-        <div class="space-y-4">
-          <label class="upload-label block text-lg font-medium text-gray-700">Upload Leaf Image</label>
-          <input id="file-model3" type="file" accept="image/*" class="w-full p-4 border-2 border-dashed border-purple-300 rounded-lg bg-purple-50 hover:bg-purple-100 transition-colors">
-          <button id="btn-model3" onclick="analyzeLeaf('model3')" class="analyze-btn w-full bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600 text-white py-4 px-6 rounded-lg font-semibold shadow-lg transform transition-all duration-200 hover:scale-105">
-            🔍 Analyze Leaf Health
-          </button>
-        </div>
-      </div>
-    </div>
 
-    <!-- Model 4 Upload -->
-    <div id="upload-model4" class="upload-section hidden max-w-2xl mx-auto">
-      <div class="bg-white rounded-2xl p-8 shadow-xl border-2 border-orange-200">
-        <div class="text-center mb-6">
-          <div class="bg-orange-100 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4">
-            <span class="text-4xl">🌽</span>
-          </div>
-          <h2 class="text-2xl font-bold text-gray-800 mb-2">Other Crops Analysis</h2>
-          <p class="text-gray-600">Comprehensive analysis for maize (corn), bajra & toor dal</p>
-        </div>
-        
         <div class="space-y-4">
           <label class="upload-label block text-lg font-medium text-gray-700">Upload Leaf Image</label>
-          <input id="file-model4" type="file" accept="image/*" class="w-full p-4 border-2 border-dashed border-orange-300 rounded-lg bg-orange-50 hover:bg-orange-100 transition-colors">
-          <button id="btn-model4" onclick="analyzeLeaf('model4')" class="analyze-btn w-full bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white py-4 px-6 rounded-lg font-semibold shadow-lg transform transition-all duration-200 hover:scale-105">
+          <input id="file-model3" type="file" accept="image/*"
+            class="w-full p-4 border-2 border-dashed border-yellow-300 rounded-lg bg-yellow-50 hover:bg-yellow-100 transition-colors">
+          <button id="btn-model3" onclick="analyzeLeaf('model3')"
+            class="analyze-btn w-full bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white py-4 px-6 rounded-lg font-semibold shadow-lg transform transition-all duration-200 hover:scale-105">
             🔍 Analyze Leaf Health
           </button>
         </div>
@@ -412,23 +185,78 @@
     <!-- Results Section -->
     <div id="results-section" class="hidden max-w-4xl mx-auto mt-12">
       <div class="bg-white rounded-2xl p-8 shadow-2xl border border-gray-200">
-        <h2 id="results-title" class="text-3xl font-bold text-center mb-8 text-gray-800">Analysis Results</h2>
-        
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-          <div class="bg-gradient-to-br from-indigo-50 to-indigo-100 p-6 rounded-xl shadow-md">
-            <div class="flex items-center mb-3">
-              <span class="text-2xl mr-3">💡</span>
-              <h3 class="font-semibold text-gray-700">Treatment Recommendation</h3>
-            </div>
-            <p id="recommendation-value" class="text-sm font-medium text-indigo-600">No treatment required. Maintain regular watering.</p>
+        <div class="flex justify-between items-center mb-8">
+          <h2 id="results-title" class="text-3xl font-bold text-gray-800">Analysis Results</h2>
+          <div class="flex space-x-4">
+            <button onclick="openResultsWindow()"
+              class="bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 text-white py-2 px-4 rounded-lg font-semibold shadow-md transform transition-all duration-200 hover:scale-105">
+              📊 View in New Window
+            </button>
+            <button onclick="exportToPDF()"
+              class="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white py-2 px-4 rounded-lg font-semibold shadow-md transform transition-all duration-200 hover:scale-105">
+              📄 Export PDF
+            </button>
           </div>
         </div>
 
-        <!-- Voice Report Button -->
-        <div class="text-center">
-          <button id="voice-btn" onclick="speakResults()" class="bg-gradient-to-r from-teal-500 to-cyan-500 hover:from-teal-600 hover:to-cyan-600 text-white py-3 px-8 rounded-xl font-semibold shadow-lg transform transition-all duration-200 hover:scale-105">
-            🔊 Hear Voice Report
-          </button>
+        <div id="results-content">
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+            <div class="bg-gradient-to-br from-blue-50 to-blue-100 p-6 rounded-xl shadow-md">
+              <div class="flex items-center mb-3">
+                <span class="text-2xl mr-3">🏥</span>
+                <h3 id="health-label" class="font-semibold text-gray-700">Health Status</h3>
+              </div>
+              <p id="health-value" class="text-2xl font-bold text-blue-600">-</p>
+            </div>
+
+            <div class="bg-gradient-to-br from-red-50 to-red-100 p-6 rounded-xl shadow-md">
+              <div class="flex items-center mb-3">
+                <span class="text-2xl mr-3">⚠️</span>
+                <h3 id="damage-label" class="font-semibold text-gray-700">Damage Percentage</h3>
+              </div>
+              <p id="damage-value" class="text-2xl font-bold text-red-600">-</p>
+            </div>
+
+            <div class="bg-gradient-to-br from-yellow-50 to-yellow-100 p-6 rounded-xl shadow-md">
+              <div class="flex items-center mb-3">
+                <span class="text-2xl mr-3">📊</span>
+                <h3 id="severity-label" class="font-semibold text-gray-700">Severity Level</h3>
+              </div>
+              <p id="severity-value" class="text-2xl font-bold text-yellow-600">-</p>
+            </div>
+
+            <div class="bg-gradient-to-br from-green-50 to-green-100 p-6 rounded-xl shadow-md">
+              <div class="flex items-center mb-3">
+                <span class="text-2xl mr-3">📐</span>
+                <h3 id="lai-label" class="font-semibold text-gray-700">Leaf Area Index</h3>
+              </div>
+              <p id="lai-value" class="text-2xl font-bold text-green-600">-</p>
+            </div>
+
+            <div class="bg-gradient-to-br from-purple-50 to-purple-100 p-6 rounded-xl shadow-md">
+              <div class="flex items-center mb-3">
+                <span class="text-2xl mr-3">🦠</span>
+                <h3 id="disease-label" class="font-semibold text-gray-700">Detected Disease</h3>
+              </div>
+              <p id="disease-value" class="text-lg font-bold text-purple-600">-</p>
+            </div>
+
+            <div class="bg-gradient-to-br from-indigo-50 to-indigo-100 p-6 rounded-xl shadow-md">
+              <div class="flex items-center mb-3">
+                <span class="text-2xl mr-3">💡</span>
+                <h3 id="recommendation-label" class="font-semibold text-gray-700">Treatment Recommendation</h3>
+              </div>
+              <p id="recommendation-value" class="text-sm font-medium text-indigo-600">-</p>
+            </div>
+          </div>
+
+          <!-- Voice Report Button -->
+          <div class="text-center">
+            <button id="voice-btn" onclick="speakResults()"
+              class="bg-gradient-to-r from-teal-500 to-cyan-500 hover:from-teal-600 hover:to-cyan-600 text-white py-3 px-8 rounded-xl font-semibold shadow-lg transform transition-all duration-200 hover:scale-105">
+              🔊 Hear Voice Report
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -449,50 +277,12 @@
         </div>
       </div>
       <div class="mt-4 pt-4 border-t border-gray-700">
-        <p id="footer-text" class="text-sm text-gray-300">© 2025 Smart AgriTech Platform | Empowering Farmers with AI</p>
+        <p id="footer-text" class="text-sm text-gray-300">© 2025 Smart AgriTech Platform | Empowering Farmers with AI
+        </p>
       </div>
     </div>
   </footer>
 
 </body>
-</html>-br from-blue-50 to-blue-100 p-6 rounded-xl shadow-md">
-            <div class="flex items-center mb-3">
-              <span class="text-2xl mr-3">🏥</span>
-              <h3 class="font-semibold text-gray-700">Health Status</h3>
-            </div>
-            <p id="health-value" class="text-2xl font-bold text-blue-600">Healthy</p>
-          </div>
-          
-          <div class="bg-gradient-to-br from-red-50 to-red-100 p-6 rounded-xl shadow-md">
-            <div class="flex items-center mb-3">
-              <span class="text-2xl mr-3">⚠️</span>
-              <h3 class="font-semibold text-gray-700">Damage Percentage</h3>
-            </div>
-            <p id="damage-value" class="text-2xl font-bold text-red-600">15%</p>
-          </div>
-          
-          <div class="bg-gradient-to-br from-yellow-50 to-yellow-100 p-6 rounded-xl shadow-md">
-            <div class="flex items-center mb-3">
-              <span class="text-2xl mr-3">📊</span>
-              <h3 class="font-semibold text-gray-700">Severity Level</h3>
-            </div>
-            <p id="severity-value" class="text-2xl font-bold text-yellow-600">Mild</p>
-          </div>
-          
-          <div class="bg-gradient-to-br from-green-50 to-green-100 p-6 rounded-xl shadow-md">
-            <div class="flex items-center mb-3">
-              <span class="text-2xl mr-3">📐</span>
-              <h3 class="font-semibold text-gray-700">Leaf Area Index</h3>
-            </div>
-            <p id="lai-value" class="text-2xl font-bold text-green-600">2.1</p>
-          </div>
-          
-          <div class="bg-gradient-to-br from-purple-50 to-purple-100 p-6 rounded-xl shadow-md">
-            <div class="flex items-center mb-3">
-              <span class="text-2xl mr-3">🦠</span>
-              <h3 class="font-semibold text-gray-700">Detected Disease</h3>
-            </div>
-            <p id="disease-value" class="text-lg font-bold text-purple-600">None detected</p>
-          </div>
-          
-          <div class="bg-gradient-to
+
+</html>
