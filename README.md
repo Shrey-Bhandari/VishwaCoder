@@ -18,8 +18,8 @@ A cutting-edge solution that empowers users to effortlessly assess plant health,
 
 This project is built using a robust stack of modern technologies to ensure high performance and reliability.
 
--   **Frontend:** HTML, CSS, JavaScript (for the web interface)
--   **Backend:** Python (Flask/Django)
+-   **Frontend:** HTML, CSS, JavaScript, TailWind CSS (for the web interface)
+-   **Backend:** Python (Flask)
 -   **AI/ML:** TensorFlow/PyTorch (for model training and inference), OpenCV (for image processing)
 -   **Audio:** Google Text-to-Speech (gTTS) or a similar library for generating audio feedback
 
@@ -86,6 +86,3 @@ We welcome contributions! If you have suggestions or want to improve the project
 
 ---
 
-## 📄 License
-
-This project is licensed under the MIT License. See the `LICENSE` file for details.
